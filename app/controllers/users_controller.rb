@@ -8,7 +8,6 @@ class UsersController <ApplicationController
   end 
 
   def create 
-    # require 'pry'; binding.pry
     if params[:user][:password] == params[:user][:password_confirmation]
       user = User.create(user_params)
       if user.save
@@ -22,6 +21,22 @@ class UsersController <ApplicationController
       redirect_back(fallback_location: register_path)
     end
   end 
+
+  def login_form; end
+
+  def login_user
+    user = User.find_by(email: params[:email])
+    if !user 
+      flash[:error] = "Invalid email"
+      redirect_back(fallback_location: login_path)
+    elsif user.authenticate(params[:password])
+      flash[:success] = "Welcome, #{user.name}"
+      redirect_to user_path(user)
+    else
+      flash[:error] = "Try Again :("
+      redirect_back(fallback_location: login_path)
+    end
+  end
 
   private 
 
