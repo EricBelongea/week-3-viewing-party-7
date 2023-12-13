@@ -1,30 +1,23 @@
 class UsersController <ApplicationController 
+  before_action :require_current_user, only: %w[show]
+
   def new 
     @user = User.new
   end 
 
   def show 
-    if !current_user
-      require_current_user
-    else
-      @user = User.find(current_user.id)
-    end
+    @user = User.find(current_user.id)
   end 
 
   def create 
-    if params[:user][:password] == params[:user][:password_confirmation]
-      user = User.create(user_params)
-      if user.save
-        session[:user_id] = user.id
-        redirect_to dashboard_path(user)
-      else  
-        flash[:error] = user.errors.full_messages.to_sentence
-        redirect_to register_path
-      end 
-    else
-      flash[:error] = "Passwords must match"
-      redirect_back(fallback_location: register_path)
-    end
+    user = User.create(user_params)
+    if user.save
+      session[:user_id] = user.id
+      redirect_to dashboard_path(user)
+    else  
+      flash[:error] = user.errors.full_messages.to_sentence
+      redirect_to register_path
+    end 
   end 
 
   def login_form; end
@@ -57,6 +50,6 @@ class UsersController <ApplicationController
   end
 
   def user_params 
-    params.require(:user).permit(:name, :email, :password)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation)
   end 
 end 

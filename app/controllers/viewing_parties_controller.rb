@@ -1,21 +1,15 @@
 class ViewingPartiesController < ApplicationController 
+  before_action :require_current_user, only: %w[new create]
+
   def new
-    if !current_user
-      require_current_user
-    else
       @user = User.find(params[:user_id])
       @movie = Movie.find(params[:movie_id])
-    end
   end 
   
   def create 
-    if !current_user
-      require_current_user
-    else
       user = User.find(params[:user_id])
       user.viewing_parties.create(viewing_party_params)
       redirect_to dashboard_path(current_user.id)
-    end
   end 
 
   private 
