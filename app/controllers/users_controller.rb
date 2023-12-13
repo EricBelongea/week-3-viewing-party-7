@@ -11,6 +11,7 @@ class UsersController <ApplicationController
     if params[:user][:password] == params[:user][:password_confirmation]
       user = User.create(user_params)
       if user.save
+        session[:user_id] = user.id
         redirect_to user_path(user)
       else  
         flash[:error] = user.errors.full_messages.to_sentence
@@ -30,12 +31,18 @@ class UsersController <ApplicationController
       flash[:error] = "Invalid email"
       redirect_back(fallback_location: login_path)
     elsif user.authenticate(params[:password])
+      session[:user_id] = user.id
       flash[:success] = "Welcome, #{user.name}"
       redirect_to user_path(user)
     else
       flash[:error] = "Try Again :("
       redirect_back(fallback_location: login_path)
     end
+  end
+
+  def log_out
+    session.clear
+    redirect_to root_path
   end
 
   private 
