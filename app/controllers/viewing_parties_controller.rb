@@ -1,7 +1,11 @@
 class ViewingPartiesController < ApplicationController 
   def new
-    @user = User.find(params[:user_id])
-    @movie = Movie.find(params[:movie_id])
+    if !current_user
+      require_current_user
+    else
+      @user = User.find(params[:user_id])
+      @movie = Movie.find(params[:movie_id])
+    end
   end 
   
   def create 
